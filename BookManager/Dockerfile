@@ -1,21 +1,16 @@
-# Etapa de build com imagem slim
-FROM mcr.microsoft.com/dotnet/sdk:6.0-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /source
 
-# Copia e restaura dependências
 COPY . .
-RUN dotnet restore --no-cache
+RUN dotnet restore
 
-# Publica a aplicação
+COPY . ./
 RUN dotnet publish -c release -o /app
 
-# Etapa de runtime com imagem slim
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-slim
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app ./
+COPY --from=build  /app ./
 
-# Expõe a porta 80 para o tráfego HTTP
 EXPOSE 80
 
-# Define o entrypoint
 ENTRYPOINT ["dotnet", "BookManager.dll"]
