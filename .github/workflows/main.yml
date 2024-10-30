@@ -1,52 +1,29 @@
 name: CICD
 on: 
-  # push:
-  #   branches: [ main ]    
   pull_request:
-    branches: ["main"]
+    branches: ["main", "develop"] 
     types: [closed]
   workflow_dispatch:
     
 jobs:
-  build-and-deploy:
+  CI:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: iis-gerfloor-prod
-        run: |
-          docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./BookManager/Dockerfile .
-          docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT    
+  CD-Dev:
+    if: github.ref == 'refs/heads/develop'
+    needs: [CI]
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main
+    with:
+      environment: dev
+    secrets: inherit
 
-      - name: Update Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task_definition.json
-          container-name: iis-gerfloor
-          image: ${{ steps.build-image.outputs.image }}    
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: svc-iis-gerfloor-prod
-          cluster: cluster-psg-iis-gerfloor-prod
-          wait-for-service-stability: true
+  CD-Prod:
+    if: github.ref == 'refs/heads/main' 
+    needs: [CI]
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main
+    with:
+      environment: prod
+    secrets: inherit
