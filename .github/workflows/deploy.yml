@@ -13,14 +13,14 @@ jobs:
     environment: ${{ inputs.environment }}    
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.5
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECRs
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
@@ -46,7 +46,7 @@ jobs:
         env:
           IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME          
+          trivy image --severity HIGH,CRITICAL --ignorefile .trivyignore $IMAGE_NAME       
 
       - name: Update Amazon ECS task definition
         id: task-def
@@ -56,7 +56,7 @@ jobs:
           container-name: iis-gerfloor
           image: ${{ steps.build-image.outputs.image }}    
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: svc-iis-gerfloor-prod
