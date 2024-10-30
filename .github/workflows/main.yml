@@ -18,7 +18,7 @@ jobs:
     # Condição para rodar somente se o PR for para a branch develop
     if: github.ref == 'refs/heads/develop'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@develop  # Certifique-se de que a branch é 'develop' ou ajuste conforme necessário
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@develop 
     with:
       environment: dev
     secrets: inherit
@@ -27,7 +27,7 @@ jobs:
     # Condição para rodar somente se o PR for para a branch main
     if: github.ref == 'refs/heads/main'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main     # Certifique-se de que a branch é 'main' ou ajuste conforme necessário
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main    
     with:
       environment: prod
     secrets: inherit
