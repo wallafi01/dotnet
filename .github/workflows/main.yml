@@ -5,7 +5,7 @@ on:
       - "main"        # Aciona quando há um PR fechado (merge) para a branch main
       - "develop"     # Aciona quando há um PR fechado (merge) para a branch develop
     types: [closed]   # Somente quando o PR é fechado
-  workflow_dispatch:  # Permite acionar manualmente, se necessário
+  workflow_dispatch:  # Permite acionar manualmente, se necessário as
     
 jobs:
   CI:
