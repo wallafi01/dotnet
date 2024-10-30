@@ -55,7 +55,7 @@ jobs:
           task-definition: task_definition.json
           container-name: iis-gerfloor
           image: ${{ steps.build-image.outputs.image }}    
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy Amazon ECS task definitions
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
