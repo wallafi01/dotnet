@@ -46,7 +46,7 @@ jobs:
         env:
           IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME          
+          trivy image --exit-code 1 --severity HIGH,CRITICAL --ignorefile .trivyignore $IMAGE_NAME        
 
       - name: Update Amazon ECS task definition
         id: task-def
