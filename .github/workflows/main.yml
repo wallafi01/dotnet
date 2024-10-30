@@ -1,8 +1,14 @@
 name: CICD
-on:
+#on:
+  # push:
+  #   branches: [ main ]
+on: 
+  pull_request:
+    branches: ["main"]
+    types: closed
   push:
-    branches: [ main ]
-
+  workflow_dispatch:
+    
 jobs:
   build-and-deploy:
     runs-on: [ ubuntu-latest ]
