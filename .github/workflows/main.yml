@@ -15,7 +15,7 @@ jobs:
   CD-Dev:
     if: github.ref == 'refs/heads/develop'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@develop
     with:
       environment: dev
     secrets: inherit
