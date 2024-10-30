@@ -1,9 +1,11 @@
 name: CICD
 on: 
   pull_request:
-    branches: ["main", "develop"] 
-    types: [closed]
-  workflow_dispatch:
+    branches: 
+      - "main"        # Aciona quando há um PR fechado (merge) para a branch main
+      - "develop"     # Aciona quando há um PR fechado (merge) para a branch develop
+    types: [closed]   # Somente quando o PR é fechado
+  workflow_dispatch:  # Permite acionar manualmente, se necessário
     
 jobs:
   CI:
@@ -13,17 +15,19 @@ jobs:
         uses: actions/checkout@v3
 
   CD-Dev:
+    # Condição para rodar somente se o PR for para a branch develop
     if: github.ref == 'refs/heads/develop'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main  # Ajuste a branch para main ou develop conforme necessário
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@develop  # Certifique-se de que a branch é 'develop' ou ajuste conforme necessário
     with:
       environment: dev
     secrets: inherit
 
   CD-Prod:
+    # Condição para rodar somente se o PR for para a branch main
     if: github.ref == 'refs/heads/main'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main  # Ajuste a branch para main ou develop conforme necessário
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main     # Certifique-se de que a branch é 'main' ou ajuste conforme necessário
     with:
       environment: prod
     secrets: inherit
