@@ -15,15 +15,15 @@ jobs:
   CD-Dev:
     if: github.ref == 'refs/heads/develop'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@develop
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main  # Ajuste a branch para main ou develop conforme necessário
     with:
       environment: dev
     secrets: inherit
 
   CD-Prod:
-    if: github.ref == 'refs/heads/main' 
+    if: github.ref == 'refs/heads/main'
     needs: [CI]
-    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main
+    uses: wallafi01/dotnet/.github/workflows/deploy.yml@main  # Ajuste a branch para main ou develop conforme necessário
     with:
       environment: prod
     secrets: inherit
