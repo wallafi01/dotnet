@@ -1,0 +1,44 @@
+{
+    "family": "task-iis-gerfloor-prod",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "iis-gerfloor",
+            "image": "216989136189.dkr.ecr.us-east-1.amazonaws.com/iis-gerfloor-prod:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "Development"
+                },
+                {
+                    "name": "MONGODBCONFIG:CONNECTIONSTRING",
+                    "value": "mongodb://mongo.svc.local:27017"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/task-iis-gerfloor-prod",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::216989136189:role/ecsTaskExecutionRole-05",
+    "taskRoleArn": "arn:aws:iam::216989136189:role/ecsTaskExecutionRole-05"
+}
