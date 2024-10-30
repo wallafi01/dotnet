@@ -36,6 +36,17 @@ jobs:
           docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./BookManager/Dockerfile .
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT    
+         
+      # Adicionando etapa de verificação de vulnerabilidade com Trivy
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run Trivy scan on Docker image
+        env:
+          IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignorefile .trivyignore $IMAGE_NAME       
 
       - name: Update Amazon ECS task definition
         id: task-def
