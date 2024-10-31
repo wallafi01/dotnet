@@ -42,6 +42,8 @@ jobs:
         with:
           path: ~/.cache/trivy
           key: ${{ runner.os }}-trivy-db
+          restore-keys: |
+            ${{ runner.os }}-trivy-db
 
       - name: Install Trivy
         run: |
@@ -57,14 +59,10 @@ jobs:
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+        env:
+          IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
+        run: |
+          trivy image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 --cache-dir ~/.cache/trivy $IMAGE_NAME
 
       - name: Update Amazon ECS task definition
         id: task-def
