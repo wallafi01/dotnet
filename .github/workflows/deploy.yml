@@ -62,7 +62,13 @@ jobs:
         env:
           IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
         run: |
-          trivy image --severity CRITICAL,HIGH --ignore-unfixed  --cache-dir ~/.cache/trivy $IMAGE_NAME
+          trivy image --severity CRITICAL,HIGH --ignore-unfixed  --cache-dir ~/.cache/trivy $IMAGE_NAME 
+  
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v3.0.0 # Ex: v2.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}          
 
       - name: Update Amazon ECS task definition
         id: task-def
