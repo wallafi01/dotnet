@@ -13,14 +13,14 @@ jobs:
     environment: ${{ inputs.environment }}    
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.5
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECRs
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
@@ -37,7 +37,7 @@ jobs:
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT    
          
-      # Adicionando etapa de verificação de vulnerabilidade com Trivy
+      # Adicionando etapa de verificação de vulnerabilidade com Trivyy
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
@@ -55,8 +55,8 @@ jobs:
           task-definition: task_definition.json
           container-name: iis-gerfloor
           image: ${{ steps.build-image.outputs.image }}    
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Deploy Amazon ECS task definitions
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: svc-iis-gerfloor-prod
