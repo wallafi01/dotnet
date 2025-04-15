@@ -31,7 +31,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: iis-gerfloor-prod
+          REPOSITORY: iis-gertest-prod
         run: |
           docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./BookManager/Dockerfile .
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
@@ -53,14 +53,14 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: iis-gerfloor-prod
+          REPOSITORY: iis-gertest-prod
         run: |
           docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./BookManager/Dockerfile .
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: Run Trivy vulnerability scanner
         env:
-          IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gerfloor-prod:${{ github.sha }}
+          IMAGE_NAME: ${{ steps.login-ecr.outputs.registry }}/iis-gertest-prod:${{ github.sha }}
         run: |
           trivy image --severity CRITICAL,HIGH --ignore-unfixed  --cache-dir ~/.cache/trivy $IMAGE_NAME 
           
@@ -101,12 +101,12 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task_definition.json
-          container-name: iis-gerfloor
+          container-name: iis-gertest
           image: ${{ steps.build-image.outputs.image }}    
       - name: Deploy Amazon ECS task definitions
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: svc-iis-gerfloor-prod
-          cluster: cluster-psg-iis-gerfloor-prod
+          service: svc-iis-gertest-prod
+          cluster: cluster-psg-iis-gertest-prod
           wait-for-service-stability: true
